@@ -1,7 +1,7 @@
 ﻿<#
     
-    Author: Ian Philpot (http://adminian.com)
-    File: DNSimple.psm1
+    Author: Ian Philpot (http://adminian.com), Jordan Knapp
+    File: PowerDNSimple.psm1
     Description: Module for working with DNSimple API.
 
 #>
@@ -116,7 +116,7 @@ function DeleteRequest
 #endregion
 
 #region Domains
-function Get-SMPLDomains
+function Get-DSDomain
 {
     param(
         [Parameter(Mandatory = $true)]
@@ -124,10 +124,19 @@ function Get-SMPLDomains
         [Parameter(Mandatory = $true)]
         $domainApiToken,
         [Switch]
-        $PassThru
+        $PassThru,
+        [Switch]
+        $SandBox
     )
 
-    $url = "https://dnsimple.com/domains"
+    if ($SandBox)
+    {
+        $url = "https://api.sandbox.dnsimple.com/v1/domains"
+    }
+    else
+    {
+        $url = "https://api.dnsimple.com/v1/domains"
+    }
 
     $response = GetRequest -url $url -emailAddress $emailAddress -domainApiToken $domainApiToken
 
@@ -143,7 +152,7 @@ function Get-SMPLDomains
 #endregion
 
 #region Domain Records
-function Get-SMPLDomainRecords
+function Get-DSDomainRecord
 {
     param(
         [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
@@ -153,10 +162,21 @@ function Get-SMPLDomainRecords
         [Parameter(Mandatory = $true)]
         $domainApiToken,
         [Switch]
-        $PassThru
+        $PassThru,
+        [Switch]
+        $SandBox
     )
 
-    $url = "https://dnsimple.com/domains/$domain/records"
+    if ($SandBox)
+    {
+        $url = "https://api.sandbox.dnsimple.com/v1/domains/$domain/records"
+    }
+    else
+    {
+        $url = "https://api.dnsimple.com/v1/domains/$domain/records"
+    }
+
+
 
     $response = GetRequest -url $url -emailAddress $emailAddress -domainApiToken $domainApiToken
 
@@ -170,7 +190,7 @@ function Get-SMPLDomainRecords
     }
 }
 
-function Add-SMPLDomainRecord
+function New-DSDomainRecord
 {
     param(
         [Parameter(Mandatory = $true)]
@@ -188,10 +208,20 @@ function Add-SMPLDomainRecord
         [Parameter(Mandatory = $true)]
         $domainApiToken,
         [Switch]
-        $passThru
+        $PassThru,
+        [Switch]
+        $SandBox
     )
 
-    $url = "https://dnsimple.com/domains/$domain/records"
+    if ($SandBox)
+    {
+        $url = "https://api.sandbox.dnsimple.com/v1/domains/$domain/records"
+    }
+    else
+    {
+        $url = "https://api.dnsimple.com/v1/domains/$domain/records"
+    }
+
     $items = @{"record"=@{}}
 
     if ($name)
@@ -233,7 +263,7 @@ function Add-SMPLDomainRecord
     }
 }
 
-function Update-SMPLDomainRecord
+function Set-DSDomainRecord
 {
     param(
         [Parameter(Mandatory = $true)]
@@ -251,10 +281,21 @@ function Update-SMPLDomainRecord
         [Parameter(Mandatory = $true)]
         $domainApiToken,
         [Switch]
-        $passThru
+        $PassThru,
+        [Switch]
+        $SandBox
     )
 
-    $url = "https://dnsimple.com/domains/$domain/records/$recordID"
+    if ($SandBox)
+    {
+        $url = "https://api.sandbox.dnsimple.com/v1/domains/$domain/records/$recordID"
+    }
+    else
+    {
+        $url = "https://api.dnsimple.com/v1/domains/$domain/records/$recordID"
+    }
+
+
     $items = @{"record"=@{}}
 
     if ($name)
@@ -291,7 +332,7 @@ function Update-SMPLDomainRecord
     }
 }
 
-function Remove-SMPLDomainRecord
+function Remove-DSDomainRecord
 {
     param(
         [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
@@ -303,11 +344,22 @@ function Remove-SMPLDomainRecord
         [Parameter(Mandatory = $true)]
         $domainApiToken,
         [Switch]
-        $passThru
+        $PassThru,
+        [Switch]
+        $SandBox
     )
 
+    if ($SandBox)
+    {
+        $url = "https://api.sandbox.dnsimple.com/v1/domains/$domain/records/$recordID"
+    }
+    else
+    {
+        $url = "https://api.dnsimple.com/v1/domains/$domain/records/$recordID"
+    }
+
     $a = Read-Host "Are you sure you want to delete this record? (Y/N)"
-    $url = "https://dnsimple.com/domains/$domain/records/$recordID"
+
 
     if ($a -eq "Y")
     {
@@ -328,4 +380,4 @@ function Remove-SMPLDomainRecord
 }
 #endregion
 
-Export-ModuleMember -Function Get-SMPLDomains, Get-SMPLDomainRecords,  Add-SMPLDomainRecord, Update-SMPLDomainRecord, Remove-SMPLDomainRecord
+Export-ModuleMember -Function Get-DSDomain, Get-DSDomainRecord,  New-DSDomainRecord, Set-DSDomainRecord, Remove-DSDomainRecord
